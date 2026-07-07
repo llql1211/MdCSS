@@ -1,0 +1,7 @@
+.vscode
+.claude
+.pixi/*
+!.pixi/config.toml
+
+__pycache__/
+config.json

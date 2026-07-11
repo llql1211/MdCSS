@@ -13,9 +13,3 @@ index-url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 
 [dependencies]
 python = "3.12.*"
-
-[pypi-dependencies]
-cssutils = ">=2.15.0, <3"
-fonttools = ">=4.63.0, <5"
-jsbeautifier = ">=1.15.4, <2"
-cssbeautifier = ">=1.15.4, <2"

@@ -1,11 +1,11 @@
-from config import (
+from src.config import (
     build_parser,
     load_config,
     resolve_crossnote_style_path,
     save_config,
     resolve_extension_dir,
 )
-from builder import build_style_blocks, build_parser_blocks, write_output, load_template
+from src.builder import build_style_blocks, build_parser_blocks, write_output, load_template
 
 
 def main() -> None:

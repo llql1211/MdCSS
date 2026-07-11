@@ -5,17 +5,19 @@ from typing import Any
 
 HOME = Path.home()
 SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent          # src/ 的上一级 → 项目根
 DEFAULT_EXTENSIONS_ROOT = HOME / ".vscode" / "extensions"
 DEFAULT_OUTPUT = HOME / ".local" / "state" / "crossnote"
+CONFIG_DIR = PROJECT_ROOT / "config"
 CONFIG_FILE_NAME = "config.json"
 
 
 def load_config() -> dict[str, Any]:
-    """Load user configuration from config.json next to mdcss.py.
+    """Load user configuration from config/config.json.
 
     Returns a dict; missing file or parse errors result in an empty dict + warning.
     """
-    config_path = SCRIPT_DIR / CONFIG_FILE_NAME
+    config_path = CONFIG_DIR / CONFIG_FILE_NAME
     if not config_path.exists():
         return {}
 
@@ -92,8 +94,8 @@ def _serialize_path(value: Path | None) -> str | None:
 
 
 def save_config(args: argparse.Namespace) -> None:
-    """Write effective settings to mdcss/config.json (nested group format)."""
-    config_path = SCRIPT_DIR / CONFIG_FILE_NAME
+    """Write effective settings to config/config.json (nested group format)."""
+    config_path = CONFIG_DIR / CONFIG_FILE_NAME
 
     def _set(d: dict[str, Any], dotted: str, value: Any) -> None:
         *parts, last = dotted.split(".")

@@ -1,0 +1,83 @@
+"""Tests for src.template."""
+
+from pathlib import Path
+
+import pytest
+
+
+class TestLoadTemplate:
+    """load_template() basic behavior."""
+
+    def test_load_css_template(self, template_dir: Path) -> None:
+        from src.template import load_template
+
+        result = load_template("css", "style.css")
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_load_parser_template(self, template_dir: Path) -> None:
+        from src.template import load_template
+
+        result = load_template("parser", "preparser_column.js")
+        assert isinstance(result, str)
+        assert "mergeColumnSpec" in result
+
+    def test_load_docheader_template(self, template_dir: Path) -> None:
+        from src.template import load_template
+
+        result = load_template("docheader", "expand_detail.js")
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_missing_template_raises(self, template_dir: Path) -> None:
+        from src.template import load_template
+
+        with pytest.raises(FileNotFoundError):
+            load_template("css", "non_existent.css")
+
+    def test_unknown_directory_raises(self, template_dir: Path) -> None:
+        from src.template import load_template
+
+        with pytest.raises(FileNotFoundError):
+            load_template("unknown", "style.css")
+
+    def test_output_ends_with_newline(self, template_dir: Path) -> None:
+        from src.template import load_template
+
+        result = load_template("css", "style.css")
+        assert result.endswith("\n")
+
+
+class TestTemplateSubstitution:
+    """load_template() placeholder replacement."""
+
+    def test_substitution_works(self, template_dir: Path, tmp_path: Path) -> None:
+        """Test <variable>...<variable/> substitution in a custom template."""
+        from src.template import load_template
+
+        result = load_template("css", "printstyle.css",
+                               new_rules="body { color: red; }",
+                               print_margin="10mm")
+        assert "body { color: red; }" in result
+        assert "10mm" in result or "10mm" in result.lower() or "10 mm" in result
+
+    def test_missing_placeholder_raises(self, tmp_path: Path) -> None:
+        """Substituting a key that has no placeholder in the template."""
+        from src.template import load_template, TEMPLATE_DIR
+
+        # Use a template that definitely doesn't have a custom placeholder
+        with pytest.raises(ValueError, match="Placeholder"):
+            load_template("css", "style.css", non_existent_key="hello")
+
+
+class TestTemplateDirectory:
+    """TEMPLATE_DIR path resolution."""
+
+    def test_template_dir_exists(self) -> None:
+        from src.template import TEMPLATE_DIR
+
+        assert TEMPLATE_DIR.exists()
+        assert TEMPLATE_DIR.is_dir()
+        assert (TEMPLATE_DIR / "css").exists()
+        assert (TEMPLATE_DIR / "parser").exists()
+        assert (TEMPLATE_DIR / "docheader").exists()

@@ -1,9 +1,9 @@
 import re
 from pathlib import Path
 
-from font import resolve_font_family, resolve_font_path
-from print_style import generate_print_style
-from template import load_template
+from src.font import resolve_font_family, resolve_font_path
+from src.print_style import generate_print_style
+from src.template import load_template
 
 
 def build_style_blocks(

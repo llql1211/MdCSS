@@ -3,7 +3,7 @@ from typing import Any
 
 import cssutils  # pyright: ignore[reportMissingImports]
 
-from template import load_template
+from src.template import load_template
 
 cssutils.log.setLevel("CRITICAL")
 

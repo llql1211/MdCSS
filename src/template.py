@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import Any, Literal
 
-SCRIPT_DIR = Path(__file__).resolve().parent
+SCRIPT_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = SCRIPT_DIR / "templates"
 
 

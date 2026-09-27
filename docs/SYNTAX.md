@@ -2,6 +2,8 @@
 
 本文是 MdCSS 的语法文档，本身使用 MdCSS 扩展语法编写，推荐使用 [GitHub Pages](https://suif4599.github.io/mdcss/) 或者安装本项目后使用 Markdown Preview Enhanced 拓展进行浏览
 
+[toc]
+
 ## .图片
 
 ### .语法总览
@@ -433,7 +435,7 @@ MPE 导出的 PDF 倾向于不让代码块换页，这会导致大量的页内�
 
 ## .语法速查
 
-本章按「启用开关」汇总全部功能，便于快速查询。开关均由生成器（`mdcss.py` / `mdcss-bridge`）控制，详见 README 的参数说明：`--enable-parser` 生成 parser.js（markdown 渲染前后处理管线）与 head.html（`I`/`M` 运行时脚本），`--css-fallback-features` 在纯 CSS 模式下为指定 token 生成回退规则。各语法章节开头的引用块也标注了对应要求
+本章按「启用开关」汇总全部功能，便于快速查询。开关均由生成器（`mdcss.py` / `mdcss-bridge`）控制，详见[参数说明](https://github.com/suif4599/mdcss/blob/main/docs/config.md)：`--enable-parser` 生成 parser.js（markdown 渲染前后处理管线）与 head.html（`I`/`M` 运行时脚本），`--css-fallback-features` 在纯 CSS 模式下为指定 token 生成回退规则。各语法章节开头的引用块也标注了对应要求
 
 ### .纯 CSS
 
@@ -467,7 +469,7 @@ MPE 导出的 PDF 倾向于不让代码块换页，这会导致大量的页内�
 
 > [!NOTE]
 > MPE 0.8.36 起内联脚本被真正剥除，`I`/`M` 在 MPE 预览与导出中失效，仅 inkstone 桥接与 GitHub Pages 站点不受影响
-> 若仍需在 MPE >= 0.8.36 使用 `I`/`M`，参考 `README.md` 配置补丁
+> 若仍需在 MPE >= 0.8.36 使用 `I`/`M`，参考 [MPE 补丁说明](https://github.com/suif4599/mdcss/blob/main/docs/mpe_patch.md)
 
 ### .MPE 专有
 

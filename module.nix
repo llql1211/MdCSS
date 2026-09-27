@@ -19,6 +19,8 @@
       cfg.codeblockCss
       "--print-margin"
       cfg.printMargin
+      "--font-size"
+      cfg.fontSize
       "--auto-count"
       cfg.autoCount
     ]
@@ -143,6 +145,16 @@ in {
       description = ''
         Print content margin. Supports CSS length units and 1-4 value
         syntax (e.g. <literal>2cm</literal>, <literal>20mm 10mm</literal>).
+      '';
+    };
+
+    fontSize = lib.mkOption {
+      type = lib.types.str;
+      default = "16px";
+      description = ''
+        Base font size for the document body (e.g. <literal>14px</literal>).
+        Forced with <literal>!important</literal> to keep MPE from shrinking
+        wide tables via font scaling.
       '';
     };
 

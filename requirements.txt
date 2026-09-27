@@ -1,0 +1,6 @@
+# 运行 mdcss.py 所需的 Python 依赖（与 pixi.toml 中的依赖保持一致）
+# 用法：pip install -r requirements.txt
+fonttools>=4.63.0,<5
+cssutils>=2.15.0,<3
+jsbeautifier>=1.15.4,<2
+cssbeautifier>=2.0.3,<3

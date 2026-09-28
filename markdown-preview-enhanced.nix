@@ -15,6 +15,14 @@ nix-vscode-extensions: {
       python3 ${./tools/patch_mpe.py} --extension-dir $out/${extensionSubdir} --no-backup
     '';
   });
+
+  # home-manager >= 25.11 renamed programs.vscode.extensions to profiles.default.extensions
+  vscodeIntegration =
+    if options ? programs.vscode.profiles
+    then {programs.vscode.profiles.default.extensions = [patched];}
+    else if options ? programs.vscode.extensions
+    then {programs.vscode.extensions = [patched];}
+    else {};
 in {
   options.programs.markdown-preview-enhanced = {
     enable = lib.mkEnableOption "markdown-preview-enhanced with the mdcss preview-script patch";
@@ -37,7 +45,7 @@ in {
       description = ''
         The patched markdown-preview-enhanced derivation. Reference it in a
         vscode-with-extensions extension list; with programs.vscode the
-        module adds it to programs.vscode.extensions by itself.
+        module adds it to the default profile's extensions by itself.
       '';
     };
   };
@@ -46,10 +54,8 @@ in {
     {
       programs.markdown-preview-enhanced.finalPackage = patched;
     }
-    (lib.optionalAttrs (options ? programs && options.programs ? vscode && options.programs.vscode ? extensions) {
-      programs.vscode.extensions = [patched];
-    })
-    (lib.optionalAttrs (options ? services && options.services ? mdcss) {
+    vscodeIntegration
+    (lib.optionalAttrs (options ? services.mdcss) {
       services.mdcss.extensionDir = lib.mkDefault "${patched}/${extensionSubdir}";
     })
   ]);

@@ -25,6 +25,7 @@ NODE = shutil.which("node")
 needs_node = pytest.mark.skipif(NODE is None, reason="node not available")
 
 DEFAULT_MAPPERS = "none, chinese, number, number, latin, roman"
+GAP = "\\\\"  # two literal backslashes: the block-gap marker
 
 
 def run_pipeline(
@@ -232,10 +233,10 @@ class TestPreIndent:
 
 @needs_node
 class TestPreGap:
-    """The // block gap: standalone column-0 lines only."""
+    """The backslash block gap: standalone column-0 lines only."""
 
     def test_default_one_line(self) -> None:
-        out = pre("//\n")["markdown"]
+        out = pre(GAP + "\n")["markdown"]
         assert '<div class="mdcss-gap" data-mdcss-gap="1lh" aria-hidden="true"></div>' in out
 
     def test_explicit_sizes(self) -> None:
@@ -248,55 +249,66 @@ class TestPreGap:
             ("20", "20lh"),
             ("1000px", "1000px"),
         ):
-            out = pre(f"//[{spec}]\n")["markdown"]
+            out = pre(f"{GAP}[{spec}]\n")["markdown"]
             assert f'data-mdcss-gap="{expected}"' in out, spec
 
     def test_invalid_or_trailing_text_stays_literal(self) -> None:
         for line in (
-            "//[foo]\n",
-            "//[0]\n",
-            "//[-1]\n",
-            "//[21]\n",
-            "//[1001px]\n",
-            "// comment\n",
-            "//[8pt] extra\n",
-            " //\n",
+            f"{GAP}[foo]\n",
+            f"{GAP}[0]\n",
+            f"{GAP}[-1]\n",
+            f"{GAP}[21]\n",
+            f"{GAP}[1001px]\n",
+            f"{GAP} comment\n",
+            f"{GAP}[8pt] extra\n",
+            f" {GAP}\n",
+            f"text {GAP}\n",
         ):
             assert "mdcss-gap" not in pre(line)["markdown"], line
 
     def test_front_matter_is_kept_and_skipped(self) -> None:
-        md = "---\ntitle: x\n//\n---\n\nbody\n"
+        md = f"---\ntitle: x\n{GAP}\n---\n\nbody\n"
         out = pre(md)["markdown"]
-        assert out.startswith("---\ntitle: x\n//\n---")
+        assert out.startswith(f"---\ntitle: x\n{GAP}\n---")
         assert "mdcss-gap" not in out
 
     def test_gap_after_front_matter(self) -> None:
-        md = "---\ntitle: x\n---\n\n//\n\nbody\n"
+        md = f"---\ntitle: x\n---\n\n{GAP}\n\nbody\n"
         out = pre(md)["markdown"]
         assert out.startswith("---\ntitle: x\n---")
         assert "mdcss-gap" in out
 
     def test_fences_are_protected(self) -> None:
-        for src in ("```\n//\n//[8pt]\n```\n", "~~~\n//\n~~~\n"):
+        for src in (f"```\n{GAP}\n{GAP}[8pt]\n```\n", f"~~~\n{GAP}\n~~~\n"):
             assert "mdcss-gap" not in pre(src)["markdown"]
 
     def test_indented_code_and_list_lines_stay_literal(self) -> None:
-        assert "mdcss-gap" not in pre("    //\n")["markdown"]
-        assert "mdcss-gap" not in pre("- item\n\n  //\n")["markdown"]
+        assert "mdcss-gap" not in pre(f"    {GAP}\n")["markdown"]
+        assert "mdcss-gap" not in pre(f"- item\n\n  {GAP}\n")["markdown"]
 
-    def test_escaped_gap_stays_literal(self) -> None:
-        out = pre("\\//\n")["markdown"]
+    def test_table_backslashes_are_untouched(self) -> None:
+        src = f"| a | {GAP} |\n| - | - |\n"
+        assert "mdcss-gap" not in pre(src)["markdown"]
+
+    def test_latex_line_end_is_untouched(self) -> None:
+        src = "$$\n\\begin{aligned}\na &= b \\\\\nc &= d\n\\end{aligned}\n$$\n"
+        out = pre(src)["markdown"]
         assert "mdcss-gap" not in out
-        assert "\\//" in out
+        assert "a &= b \\\\\n" in out
+
+    def test_doubled_marker_stays_literal(self) -> None:
+        out = pre(GAP * 2 + "\n")["markdown"]
+        assert "mdcss-gap" not in out
+        assert GAP * 2 in out
 
     def test_content_after_gap_maps_back(self) -> None:
-        md = "para\n\n//\n\nnext\n"
+        md = f"para\n\n{GAP}\n\nnext\n"
         res = pre(md)
         final = res["markdown"].split("\n")
         assert res["mapped"][final.index("next")] == 5
 
     def test_gap_between_tight_lines_gets_blank_lines(self) -> None:
-        out = pre("a\n//\nb\n")["markdown"]
+        out = pre(f"a\n{GAP}\nb\n")["markdown"]
         assert "\n\n<div class=\"mdcss-gap\"" in out
         assert "</div>\n\nb" in out
 

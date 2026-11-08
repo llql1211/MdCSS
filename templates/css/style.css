@@ -59,7 +59,7 @@
   .has-indent li > p {
     text-indent: 0;
   }
-  /* Block-level gap from the // syntax. `1lh` follows the current line-height;
+  /* Block-level gap from the \\ syntax. `1lh` follows the current line-height;
      the 1.6em declaration is the fallback for engines without the lh unit. */
   .mdcss-gap {
     display: block;

@@ -4,11 +4,18 @@
     break-after: auto !important;
     page-break-after: auto !important;
   }
+  /* The margin belongs on the page box. A body padding would be *added* to the
+     browser's own paper margin (10 mm in Chromium/Edge), so the configured
+     value never matched the real margin and could not be narrowed. @page is
+     honoured while the print dialog keeps "Default" margins. */
+  @page {
+    margin: <variable>print_margin</variable>;
+  }
   /* Auto-generated print style (cssutils based) */
   body {
     background: white !important;
     color: black !important;
-    padding: <variable>print_margin</variable> !important;
+    padding: 0 !important;
   }
   table, th, td {
     background: white !important;
@@ -143,4 +150,54 @@
     mix-blend-mode: normal !important;
   }
 <variable>fallback_print_resets</variable>
+  /* ---- Print geometry ---------------------------------------------------
+     Chromium lays a page out at the printable width and, when the document
+     turns out wider, re-lays it out on a wider virtual page and scales the
+     whole page down — one over-wide element therefore shrinks every line,
+     fonts included. Keep the printed document inside the page box: tables
+     wrap to the available width instead of pushing the page wider. */
+  html body, body {
+    font-size: <variable>font_size</variable> !important;
+  }
+  html, body {
+    max-width: 100% !important;
+  }
+  /* The theme re-emits `html body table { display: block; width: 100%;
+     overflow: auto; word-break: keep-all }` inside this block, so the table
+     has to be restored explicitly — as a scroll container in print it both
+     clips and widens the laid-out page. */
+  html body table,
+  .markdown-preview table {
+    display: table !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    table-layout: auto !important;
+    overflow: visible !important;
+    word-break: normal !important;
+  }
+  html body th,
+  html body td,
+  .markdown-preview th,
+  .markdown-preview td {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+  html body figure,
+  html body img,
+  html body pre,
+  .markdown-preview figure,
+  .markdown-preview img,
+  .markdown-preview pre {
+    max-width: 100% !important;
+  }
+  /* The preview shell is a scroll container on screen; in print it must not
+     be, otherwise its scrollable overflow is expanded into the page width. */
+  .crossnote,
+  .markdown-preview {
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
 }

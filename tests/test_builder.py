@@ -138,7 +138,11 @@ class TestBuildStyleBlocks:
             enable_table_horizontal_scroll=False,
         )
         combined = "\n".join(blocks)
-        assert "overflow-x" in combined
+        # Whole-axis overflow: overflow-x next to a theme overflow-y:auto would
+        # compute to auto and turn the table into a scroll container.
+        assert "width: fit-content !important" in combined
+        assert "overflow: visible !important" in combined
+        assert "overflow-x" not in combined
 
     def test_zebra_strategy_rules_present(self, sample_css: Path, codeblock_css: Path, tmp_path: Path) -> None:
         from src.builder import build_style_blocks

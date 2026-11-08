@@ -41,6 +41,9 @@ def layout_props_json() -> str:
 # Table layout block for no-horizontal-scroll mode; templates/inkstone/
 # mdcss.css carries a scoped, token-wrapped copy of the same rules (pinned
 # by tests/test_css_sync.py).
+# `overflow: visible` is set as a whole: pairing overflow-x with a theme-set
+# overflow-y:auto makes the computed value auto and silently turns the table
+# into a scroll container (clips content and widens the print page).
 _TABLE_LAYOUT_BLOCK = """
   table {
     display: table !important;
@@ -48,7 +51,7 @@ _TABLE_LAYOUT_BLOCK = """
     max-width: 100% !important;
     margin: 0 auto !important;
     table-layout: auto !important;
-    overflow-x: visible !important;
+    overflow: visible !important;
     font-size: inherit !important;
   }
   th, td {
@@ -218,6 +221,7 @@ def build_style_blocks(
             main_css_path,
             codeblock_css_path,
             print_margin=print_margin,
+            font_size=font_size,
             fallback_print_resets="" if enable_parser else build_fallback_print_resets(css_fallback_features or []),
         )
     )

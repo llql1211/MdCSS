@@ -7,6 +7,8 @@
 > 可使用 `--save-config` 将本次**生效值**写回 `config/config.json`
 > Flake 方式安装的 MdCSS 没有 `config.json`，取而代之的是 Option，详见[文档](./FLAKE.md)
 
+> MPE 会把编译后的 `~/.crossnote/style.less` 随预览服务一起缓存：重新生成后必须**重启预览服务**才生效——关闭预览再重新 "Open in Browser"（必要时重启 VS Code），只刷新页面或重新打印读到的仍是旧样式
+
 ## 参数列表
 
 ### 主题与字体

@@ -6,8 +6,10 @@
   }
   /* The margin belongs on the page box. A body padding would be *added* to the
      browser's own paper margin (10 mm in Chromium/Edge), so the configured
-     value never matched the real margin and could not be narrowed. @page is
-     honoured while the print dialog keeps "Default" margins. */
+     value never matched the real margin, could not be narrowed, and pushed the
+     body box past the page bottom — a short document then printed a trailing
+     blank page. @page is honoured while the print dialog keeps "Default"
+     margins. */
   @page {
     margin: <variable>print_margin</variable>;
   }

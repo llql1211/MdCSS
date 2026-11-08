@@ -17,8 +17,8 @@
 | `--codeblock-css` | 不可省略 | 代码块打印主题 CSS，相对路径同上 |
 | `--font` | `None` | 正文字体文件路径（`.ttf`/`.otf`/`.woff`/`.woff2`/`.ttc`/`.otc`）或字体族名称；给路径时自动解析同目录下的同族变体 |
 | `--code-font` | `None` | 代码块字体，语义同 `--font` |
-| `--font-size` | `16px` | 基础字号，避免表格自动缩小，不建议调整 |
-| `--print-margin` | `5mm` | 打印正文边距，如 `2cm`、`20mm 10mm` |
+| `--font-size` | `16px` | 基础字号，预览与打印一致（打印时在 `@media print` 中显式固定），不建议调整 |
+| `--print-margin` | `5mm` | 打印边距，写入 `@page { margin }`，如 `2cm`、`20mm 10mm`。打印对话框需保持默认边距，手动设置的边距会覆盖它 |
 
 字体名称的解析方式：Linux 走 fontconfig，Windows 走字体注册表与系统字体目录
 

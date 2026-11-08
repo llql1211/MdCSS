@@ -283,6 +283,7 @@ POST_PASSES: tuple[tuple[str, str], ...] = (
     ("postparser_columnstyle.js", "inkstone"),
     ("postparser_linerestore.js", "both"),
     ("postparser_columnsync.js", "mpe"),
+    ("postparser_anchor.js", "both"),
 )
 
 

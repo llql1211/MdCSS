@@ -11,8 +11,10 @@ re-capture and re-bake.
 """
 
 import json
+import re
 import shutil
 import subprocess
+import urllib.parse
 from pathlib import Path
 
 import pytest
@@ -549,6 +551,47 @@ class TestPostUriDecode:
     def test_remote_src_untouched(self) -> None:
         img = '<p><img src="https://e.com/a%25b.png" alt="alt"></p>'
         assert post(img) == img
+
+
+@needs_node
+class TestPostAnchor:
+    def _hrefs(self, html: str) -> list[str]:
+        return [urllib.parse.unquote(m) for m in re.findall(r'href="#([^"]*)"', html)]
+
+    def test_punctuation_slug_difference_resolved(self) -> None:
+        html = (
+            '<h2 id="三-带标点的中文标题">三、带标点的中文标题</h2>\n'
+            '<p><a href="#%E4%B8%89%E5%B8%A6%E6%A0%87%E7%82%B9%E7%9A%84%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98">跳转</a></p>\n'
+        )
+        out = post(html)
+        assert self._hrefs(out) == ["三-带标点的中文标题"]
+
+    def test_hyphen_difference_resolved(self) -> None:
+        html = (
+            '<h2 id="使用-code-的标题">使用 code 的标题</h2>\n'
+            '<p><a href="#%E4%BD%BF%E7%94%A8code%E7%9A%84%E6%A0%87%E9%A2%98">跳转</a></p>\n'
+        )
+        out = post(html)
+        assert self._hrefs(out) == ["使用-code-的标题"]
+
+    def test_exact_and_non_heading_links_untouched(self) -> None:
+        html = (
+            '<h2 id="pure-english-title">Pure English Title</h2>\n'
+            '<p><a href="#pure-english-title">ok</a> '
+            '<a href="#fn1">fn</a> '
+            '<a href="other.md#pure-english-title">file</a> '
+            '<a href="https://example.com/#pure-english-title">web</a></p>\n'
+        )
+        assert post(html) == html
+
+    def test_duplicate_headings_keep_first_match(self) -> None:
+        html = (
+            '<h2 id="重复标题">重复标题</h2>\n'
+            '<h2 id="重复标题-1">重复标题</h2>\n'
+            '<p><a href="#%E9%87%8D%E5%A4%8D%E6%A0%87%E9%A2%98-1">second</a></p>\n'
+        )
+        out = post(html)
+        assert self._hrefs(out) == ["重复标题-1"]
 
 
 @needs_node

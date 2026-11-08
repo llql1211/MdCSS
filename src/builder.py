@@ -49,7 +49,11 @@ _TABLE_LAYOUT_BLOCK = """
     display: table !important;
     width: fit-content !important;
     max-width: 100% !important;
-    margin: 0 auto !important;
+    /* Only the horizontal centring is ours: keeping the theme's vertical
+       margins (`html body table { margin: 10px 0 15px 0 }`) is what separates
+       the table from the text below it. */
+    margin-left: auto !important;
+    margin-right: auto !important;
     table-layout: auto !important;
     overflow: visible !important;
     font-size: inherit !important;

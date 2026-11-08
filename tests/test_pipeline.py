@@ -231,6 +231,115 @@ class TestPreIndent:
 
 
 @needs_node
+class TestPreGap:
+    """The // block gap: standalone column-0 lines only."""
+
+    def test_default_one_line(self) -> None:
+        out = pre("//\n")["markdown"]
+        assert '<div class="mdcss-gap" data-mdcss-gap="1lh" aria-hidden="true"></div>' in out
+
+    def test_explicit_sizes(self) -> None:
+        for spec, expected in (
+            ("8pt", "8pt"),
+            ("1.1em", "1.1em"),
+            ("2", "2lh"),
+            ("1.5lh", "1.5lh"),
+            (" 8pt ", "8pt"),
+            ("20", "20lh"),
+            ("1000px", "1000px"),
+        ):
+            out = pre(f"//[{spec}]\n")["markdown"]
+            assert f'data-mdcss-gap="{expected}"' in out, spec
+
+    def test_invalid_or_trailing_text_stays_literal(self) -> None:
+        for line in (
+            "//[foo]\n",
+            "//[0]\n",
+            "//[-1]\n",
+            "//[21]\n",
+            "//[1001px]\n",
+            "// comment\n",
+            "//[8pt] extra\n",
+            " //\n",
+        ):
+            assert "mdcss-gap" not in pre(line)["markdown"], line
+
+    def test_front_matter_is_kept_and_skipped(self) -> None:
+        md = "---\ntitle: x\n//\n---\n\nbody\n"
+        out = pre(md)["markdown"]
+        assert out.startswith("---\ntitle: x\n//\n---")
+        assert "mdcss-gap" not in out
+
+    def test_gap_after_front_matter(self) -> None:
+        md = "---\ntitle: x\n---\n\n//\n\nbody\n"
+        out = pre(md)["markdown"]
+        assert out.startswith("---\ntitle: x\n---")
+        assert "mdcss-gap" in out
+
+    def test_fences_are_protected(self) -> None:
+        for src in ("```\n//\n//[8pt]\n```\n", "~~~\n//\n~~~\n"):
+            assert "mdcss-gap" not in pre(src)["markdown"]
+
+    def test_indented_code_and_list_lines_stay_literal(self) -> None:
+        assert "mdcss-gap" not in pre("    //\n")["markdown"]
+        assert "mdcss-gap" not in pre("- item\n\n  //\n")["markdown"]
+
+    def test_escaped_gap_stays_literal(self) -> None:
+        out = pre("\\//\n")["markdown"]
+        assert "mdcss-gap" not in out
+        assert "\\//" in out
+
+    def test_content_after_gap_maps_back(self) -> None:
+        md = "para\n\n//\n\nnext\n"
+        res = pre(md)
+        final = res["markdown"].split("\n")
+        assert res["mapped"][final.index("next")] == 5
+
+    def test_gap_between_tight_lines_gets_blank_lines(self) -> None:
+        out = pre("a\n//\nb\n")["markdown"]
+        assert "\n\n<div class=\"mdcss-gap\"" in out
+        assert "</div>\n\nb" in out
+
+
+@needs_node
+class TestPostGap:
+    def gap(self, value: str) -> str:
+        return post(
+            f'<div class="mdcss-gap" data-mdcss-gap="{value}" aria-hidden="true"></div>'
+        )
+
+    def test_one_line_uses_lh_with_em_fallback(self) -> None:
+        out = self.gap("1lh")
+        assert "height: 1.6em !important" in out
+        assert "height: 1lh !important" in out
+        assert 'aria-hidden="true"' in out
+
+    def test_multiple_lines_use_calc(self) -> None:
+        out = self.gap("2lh")
+        assert "calc(1.6em * 2)" in out
+        assert "calc(1lh * 2)" in out
+
+    def test_explicit_length(self) -> None:
+        out = self.gap("8pt")
+        assert "height: 8pt !important" in out
+
+    def test_rebuilds_reordered_attributes_and_drops_stale_style(self) -> None:
+        out = post(
+            '<div data-mdcss-gap="1.1em" class="mdcss-gap" style="color: red"></div>'
+        )
+        assert "color: red" not in out
+        assert "height: 1.1em !important" in out
+
+    def test_raw_gap_without_data_is_untouched(self) -> None:
+        html = '<div class="mdcss-gap"></div>'
+        assert post(html) == html
+
+    def test_invalid_data_is_untouched(self) -> None:
+        html = '<div class="mdcss-gap" data-mdcss-gap="bad"></div>'
+        assert post(html) == html
+
+
+@needs_node
 class TestPreTableCell:
     """Backslash-run protection: whole-cell runs become @MDCSS_BS_N@ tokens."""
 

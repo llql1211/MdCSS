@@ -54,6 +54,15 @@
 .ink-prose .has-indent li > p {
   text-indent: 0;
 }
+.ink-prose .mdcss-gap {
+  display: block;
+  height: 1.6em;
+  height: 1lh;
+  margin: 0 !important;
+  padding: 0;
+  flex: none;
+  break-inside: avoid;
+}
 .ink-prose table {
   display: table !important;
   width: fit-content !important;

@@ -714,6 +714,39 @@ class TestPostAnchor:
         out = post(html)
         assert self._hrefs(out) == ["重复标题-1"]
 
+    def test_auto_number_prefix_can_be_omitted(self) -> None:
+        html = (
+            '<h2 id="二-标题">二、标题</h2>\n'
+            '<p><a href="#%E6%A0%87%E9%A2%98">跳转</a></p>\n'
+        )
+        out = post(html)
+        assert self._hrefs(out) == ["二-标题"]
+
+    def test_hierarchical_number_prefix_can_be_omitted(self) -> None:
+        # number() emits "1\u200B.\u200B1 标题"; the browser sees "1.1 标题".
+        html = (
+            '<h3 id="1-1-标题">1\u200B.\u200B1 标题</h3>\n'
+            '<p><a href="#%E6%A0%87%E9%A2%98">跳转</a></p>\n'
+        )
+        out = post(html)
+        assert self._hrefs(out) == ["1-1-标题"]
+
+    def test_ambiguous_bare_title_is_not_rewritten(self) -> None:
+        html = (
+            '<h2 id="一-概述">一、概述</h2>\n'
+            '<h2 id="二-概述">二、概述</h2>\n'
+            '<p><a href="#%E6%A6%82%E8%BF%B0">跳转</a></p>\n'
+        )
+        assert post(html) == html
+
+    def test_exact_heading_wins_over_numbered_alias(self) -> None:
+        html = (
+            '<h2 id="一-标题">一、标题</h2>\n'
+            '<h2 id="标题">标题</h2>\n'
+            '<p><a href="#%E6%A0%87%E9%A2%98">跳转</a></p>\n'
+        )
+        assert post(html) == html
+
 
 @needs_node
 class TestLineRestore:

@@ -195,6 +195,17 @@
   .markdown-preview pre {
     max-width: 100% !important;
   }
+  /* KaTeX pairs the visible HTML with a clipped, absolutely positioned MathML
+     layer for screen readers. Chromium's print pagination still counts the
+     MathML content as page overflow, so a single inline formula can widen the
+     virtual page and shrink the whole document — and internal link
+     destinations keep the unscaled layout coordinates, which is what makes
+     PDF links land off target. The layer is invisible; drop it from print.
+     MathJax 3 has the same hidden layer under a different name. */
+  .katex-mathml,
+  mjx-assistive-mml {
+    display: none !important;
+  }
   /* The preview shell is a scroll container on screen; in print it must not
      be, otherwise its scrollable overflow is expanded into the page width. */
   .crossnote,

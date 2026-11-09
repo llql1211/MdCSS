@@ -64,6 +64,18 @@ class TestGeneratePrintStyle:
         assert "max-width: 100% !important" in table_block
         assert "overflow: visible !important" in table_block
 
+    def test_hidden_mathml_layers_not_printed(self, sample_css: Path, codeblock_css: Path) -> None:
+        """KaTeX/MathJax keep a clipped MathML twin for screen readers. Its
+        content still counts as print overflow, widens the virtual page and
+        shrinks everything — along with the PDF link destinations."""
+        from src.print_style import generate_print_style
+
+        result = generate_print_style(sample_css, codeblock_css, print_margin="5mm")
+        for selector in (".katex-mathml", "mjx-assistive-mml"):
+            start = result.index(selector)
+            block = result[start : result.index("}", start)]
+            assert "display: none !important" in block
+
     def test_zebra_strategy_rules_present(self, sample_css: Path, codeblock_css: Path) -> None:
         from src.print_style import generate_print_style
 
